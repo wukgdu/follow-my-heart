@@ -1,0 +1,17 @@
+os: Visual Studio 2015
+
+platform: x64
+
+environment:
+        matrix:
+        - test_moar: 2017.12
+        - test_moar: '' #latest
+
+install:
+  - '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
+  - appveyor-retry choco install strawberryperl --version 5.20.1.1 --allow-empty-checksums
+  - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
+
+build: off
+
+shallow_clone: true
