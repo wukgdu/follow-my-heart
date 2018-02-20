@@ -25,8 +25,8 @@
 (defun zip (fn &rest lists)
   (labels ((zip-iter (lst result)
              (let ((x (mapcar #'car lst)))
-               (cond ((some #'null lst) (nreverse result))
-                     (t (zip-iter (mapcar #'cdr lst) (push (apply fn x) result)))))))
+               (cond ((some #'null lst) (reverse result))
+                     (t (zip-iter (mapcar #'cdr lst) (cons (apply fn x) result)))))))
     (zip-iter lists nil)))
 
 ;; (zip 'list '(1 2 3) '(1 2 3) '(1 2 3))
