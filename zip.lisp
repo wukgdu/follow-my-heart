@@ -29,5 +29,11 @@
                      (t (zip-iter (mapcar #'cdr lst) (cons (apply fn x) result)))))))
     (zip-iter lists nil)))
 
-;; (zip 'list '(1 2 3) '(1 2 3) '(1 2 3))
-;; (zip '+ '(1 2 3) '(1 2 3) '(1 2 3))
+;; (zip #'list '(1 2 3) '(1 2 3) '(1 2 3))
+;; (zip #'+ '(1 2 3) '(1 2 3) '(1 2 3))
+;; (mapcar #'list '(1 2 3) '(1 2 3) '(1 2 3))
+
+;; why in perl6 
+;; zip((1,2,3)) => ((1 2 3))
+;; but
+;; zip((1,2,3), (4,5,6)) => ((1 4) (2 5) (3 6))
