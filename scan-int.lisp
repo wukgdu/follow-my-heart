@@ -13,7 +13,7 @@
          (lst2 dims (cdr lst2))
          (start (car dims) (+ (* start (car lst1)) (cadr lst2))))
       ((null (cdr lst2))
-       (setf start (reduce #'* lst1 :initial-value start))
+       (setf start (apply #'* start lst1))
        (make-array lst1
                    :displaced-to arr
                    :displaced-index-offset start)))))
