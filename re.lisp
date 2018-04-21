@@ -150,6 +150,7 @@
                            (push s1 (state-closure (NFA-end n1)))
                            (push (NFA-start n1) (state-closure (NFA-end n1)))
                            (setf (state-end-p (NFA-end n1)) nil)
+                           (setf (state-end-p s1) t)
                            (push (make-NFA :start s0 :end s1) nfa-stack)))
 
              (handle-? (tok)
