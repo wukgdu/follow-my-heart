@@ -8,10 +8,15 @@
        ,@body)))
 
 (defmacro new-hash (configs &rest pairs)
-  (let ((hash (gensym)))
-    `(let ((,hash (make-hash-table ,@configs)))
-       (dolist (pa ',pairs ,hash)
-         (setf (gethash (car pa) ,hash) (cdr pa))))))
+  (let ((hash (gensym))
+        (value-pairs (gensym)))
+    `(let ((,hash (make-hash-table ,@configs))
+           (,value-pairs (list ,@pairs)))
+       (do ((k (car ,value-pairs) (car ,value-pairs))
+            (v (cadr ,value-pairs) (cadr ,value-pairs)))
+         ((null ,value-pairs) ,hash)
+         (setf ,value-pairs (cddr ,value-pairs))
+         (setf (gethash k ,hash) v)))))
 
 ;;; utils end
 
@@ -25,12 +30,12 @@
         ;;(source str)
         key-hash)
     (setf key-hash (new-hash ()
-                             (#\[ . "left[")
-                             (#\] . "right]")
-                             (#\+ . "one-or-more")
-                             (#\* . "zero-or-more")
-                             (#\? . "zero-or-one")
-                             (#\| . "or")))
+                             #\[ "left["
+                             #\] "right]"
+                             #\+ "one-or-more"
+                             #\* "zero-or-more"
+                             #\? "zero-or-one"
+                             #\| "or"))
     (flet ((get-token ()
                       (if (>= cur-pos str-len)
                         (make-token :name "end")
@@ -106,8 +111,7 @@
                           (setf cur-states next-state)))
           (coerce s 'list))
     (mapc #'(lambda (st) (if (state-end-p st) (return-from match t)))
-          cur-states))
-  nil)
+          cur-states)))
 
 (let ((state-count -1))
   (defun create-state ()
@@ -181,12 +185,12 @@
       (clear-nfa-stack)
       (setf tokens (parser lex))
       (setf handles (new-hash (:test #'equal)
-                              ("char" . handle-char)
-                              ("concat" . handle-concat)
-                              ("or" . handle-or)
-                              ("zero-or-more" . handle-rep)
-                              ("one-or-more" . handle-rep)
-                              ("zero-or-one" . handle-?)))
+                              "char" #'handle-char
+                              "concat" #'handle-concat
+                              "or" #'handle-or
+                              "zero-or-more" #'handle-rep
+                              "one-or-more" #'handle-rep
+                              "zero-or-one" #'handle-?))
       (mapc #'(lambda (tok) (funcall (gethash (token-name tok) handles) tok))
             tokens)
       (if (and (null (cdr nfa-stack))
@@ -194,13 +198,11 @@
         (car nfa-stack)
         (error "compile error")))))
 
-(let ((pa "a?a?a?a?a?aaaaa")
-      (str "aaaaa")
-      nfa)
-  (setf nfa (re-compile pa))
-  (print (match nfa str)))
-(let ((pa "cc|a+")
-      (str "aaaaa")
-      nfa)
-  (setf nfa (re-compile pa))
-  (print (match nfa str)))
+(let ((test-pass (new-hash (:test #'equal)
+                           "a?a?a?a?a?aaaaa" "aaaaa"
+                           "cc|a+" "aaaaa")))
+  (maphash #'(lambda (k v)
+               (let ((nfa nil))
+                 (setf nfa (re-compile k))
+                 (print (match nfa v))))
+           test-pass))
