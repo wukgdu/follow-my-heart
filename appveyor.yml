@@ -7,8 +7,6 @@ environment:
         - test_moar: 2017.12
         - test_moar: '' #latest
 
-install:
-
 build: off
 
 shallow_clone: true
